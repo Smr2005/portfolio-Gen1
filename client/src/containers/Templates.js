@@ -3,12 +3,12 @@ import { useHistory } from "react-router-dom";
 import { Navbar, Nav, Button } from "react-bootstrap";
 import { UserContext } from "../context/UserContext";
 import { images } from "../components/images";
-import Template1 from "../templates/Template1";
-import Template2 from "../templates/Template2";
-import Template3 from "../templates/Template3";
-import Template4 from "../templates/Template4";
-import Template5 from "../templates/Template5";
-import Template6 from "../templates/Template6";
+import Template1 from "../templates/Template1SuperEnhanced";
+import Template2 from "../templates/Template2SuperEnhanced";
+import Template3 from "../templates/Template3SuperEnhanced";
+import Template4 from "../templates/Template4SuperEnhanced";
+import Template5 from "../templates/Template5SuperEnhanced";
+import Template6 from "../templates/Template6SuperEnhanced";
 import "aos/dist/aos.css";
 import Aos from "aos";
 import "../stylesheets/templates.css";
@@ -86,12 +86,12 @@ function Templates() {
   };
 
   const templates = [
-    { id: 'template1', image: images.portfolio1, name: 'Modern Developer', component: Template1 },
-    { id: 'template2', image: images.portfolio2, name: 'Creative Designer', component: Template2 },
-    { id: 'template3', image: images.portfolio3, name: 'Business Professional', component: Template3, useLivePreview: false },
-    { id: 'template4', image: images.portfolio4, name: 'Minimalist Clean', component: Template4 },
-    { id: 'template5', image: images.portfolio2, name: 'Developer Terminal', component: Template5 },
-    { id: 'template6', image: images.portfolio1, name: 'Marketing Pro', component: Template6 }
+    { id: 'template1', image: images.portfolio1, name: 'Modern Gradient', component: Template1, useLivePreview: true },
+    { id: 'template2', image: images.portfolio2, name: 'Dark Terminal', component: Template2, useLivePreview: true },
+    { id: 'template3', image: images.portfolio3, name: 'Creative Magazine', component: Template3, useLivePreview: true },
+    { id: 'template4', image: images.portfolio4, name: 'Card Masonry', component: Template4, useLivePreview: true },
+    { id: 'template5', image: images.portfolio2, name: 'Glassmorphism', component: Template5, useLivePreview: true },
+    { id: 'template6', image: images.portfolio1, name: 'Corporate Pro', component: Template6, useLivePreview: true }
   ];
 
   const renderTemplatePreview = (template) => {

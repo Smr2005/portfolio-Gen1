@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Form, Button, Alert } from 'react-bootstrap';
 import M from 'materialize-css';
+import { API_BASE_URL } from '../utils/api';
 
 const PasswordReset = ({ show, handleClose }) => {
   const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ const PasswordReset = ({ show, handleClose }) => {
     setMessage('');
 
     try {
-      const response = await fetch('/api/user/reset-password', {
+      const response = await fetch(`${API_BASE_URL}/api/user/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

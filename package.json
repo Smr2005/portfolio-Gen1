@@ -2,11 +2,11 @@
   "name": "portfolio_generator_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "indexme_fixed.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node indexme_fixed.js",
+    "dev": "nodemon indexme_fixed.js",
     "build": "npm install && cd client && rm -f yarn.lock && rm -rf node_modules && npm install --legacy-peer-deps && npx browserslist@latest --update-db && npm run build:legacy",
     "render-build": "npm install && cd client && npm install --legacy-peer-deps && npm run build:legacy && echo 'Checking build output...' && ls -la client/ && ls -la client/build/ || echo 'Build directory not found'",
     "heroku-postbuild": "npm run build",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
-    "axios": "^1.7.7",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
     "concurrently": "^8.2.2",
     "cookie-session": "^2.1.0",

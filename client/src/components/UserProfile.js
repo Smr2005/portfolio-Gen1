@@ -9,6 +9,7 @@ import UserNavigation from './UserNavigation';
 import '../stylesheets/userprofile.css';
 import M from 'materialize-css';
 
+import { API_BASE_URL } from '../utils/api';
 const UserProfile = () => {
   const { state, dispatch } = useContext(UserContext);
   const [profileData, setProfileData] = useState(null);
@@ -49,7 +50,7 @@ const UserProfile = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch('/api/user-profile/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/user-profile/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -88,7 +89,7 @@ const UserProfile = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch('/api/user-profile/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/user-profile/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -124,7 +125,7 @@ const UserProfile = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`/api/user-profile/portfolio/${portfolioToDelete._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/user-profile/portfolio/${portfolioToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

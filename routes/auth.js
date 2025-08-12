@@ -313,6 +313,76 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+// Emergency password reset for scrypt migration
+router.post("/emergency-reset", async (req, res) => {
+  try {
+    console.log("=== EMERGENCY PASSWORD RESET ===");
+    console.log("Email:", req.body.email);
+    
+    const { email, newPassword } = req.body;
+    
+    if (!email || !newPassword) {
+      return res.status(422).json({ error: "Email and new password are required" });
+    }
+    
+    if (newPassword.length < 5) {
+      return res.status(422).json({ error: "Password must be at least 5 characters long" });
+    }
+    
+    let user;
+    
+    // Check MongoDB connection
+    if (mongoose.connection.readyState === 1) {
+      console.log("Using MongoDB for emergency reset");
+      
+      user = await User.findOne({ email: email.toLowerCase() });
+      
+      if (!user) {
+        return res.status(422).json({ error: "User not found" });
+      }
+      
+      // Check if user has scrypt password (needs migration)
+      if (!user.password.startsWith('scrypt:')) {
+        return res.status(422).json({ 
+          error: "This endpoint is only for users with legacy password format. Use regular password reset." 
+        });
+      }
+      
+      console.log("Migrating scrypt password to bcrypt for:", user.email);
+      
+      // Hash new password with bcrypt
+      const hashedPassword = await bcrypt.hash(newPassword, 12);
+      user.password = hashedPassword;
+      
+      // Clear any existing reset tokens
+      user.resetToken = undefined;
+      user.expireToken = undefined;
+      
+      // Fix missing name field if needed
+      if (!user.name) {
+        user.name = user.email.split('@')[0]; // Use email prefix as name
+        console.log(`Fixed missing name for user: ${user.email} -> ${user.name}`);
+      }
+      
+      await user.save();
+      
+      console.log("Password migrated successfully for:", user.email);
+      
+      res.json({ 
+        message: "Password updated successfully. You can now login with your new password.",
+        migrated: true
+      });
+      
+    } else {
+      return res.status(500).json({ error: "Database not available" });
+    }
+    
+  } catch (error) {
+    console.error("Emergency reset error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/new-password", async (req, res) => {
   try {
     console.log("=== NEW PASSWORD REQUEST ===");

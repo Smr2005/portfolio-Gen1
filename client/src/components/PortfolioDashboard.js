@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Form, Modal, Badge, Spinner } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
+import { API_BASE_URL } from '../utils/api';
 const PortfolioDashboard = () => {
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,7 @@ const PortfolioDashboard = () => {
         return;
       }
 
-      const response = await fetch('/api/portfolio/my-portfolio', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/my-portfolio`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -56,7 +57,7 @@ const PortfolioDashboard = () => {
       setSuccess('');
 
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/portfolio/publish', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/publish`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,7 +87,7 @@ const PortfolioDashboard = () => {
       setSuccess('');
 
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/portfolio/unpublish', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/unpublish`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -118,7 +119,7 @@ const PortfolioDashboard = () => {
     setCheckingSlug(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/portfolio/check-slug/${slug}`, {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/check-slug/${slug}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -154,7 +155,7 @@ const PortfolioDashboard = () => {
       setError('');
 
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/portfolio/save', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/save`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

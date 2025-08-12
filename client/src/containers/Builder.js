@@ -8,6 +8,7 @@ import Template4 from "../templates/Template4";
 import Template5 from "../templates/Template5";
 import Template6 from "../templates/Template6";
 
+import { API_BASE_URL } from '../utils/api';
 function Builder() {
   const history = useHistory();
   const location = useLocation();
@@ -48,7 +49,7 @@ function Builder() {
 
   const loadExistingPortfolio = async (token) => {
     try {
-      const response = await fetch('/api/portfolio/my-portfolio', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/my-portfolio`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -183,7 +184,7 @@ function Builder() {
         return;
       }
 
-      const response = await fetch('/api/portfolio/save', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/save`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -232,7 +233,7 @@ function Builder() {
       console.log('🔄 Auto-saving current data before publishing...');
       
       // Save current data first - explicit save call
-      const saveResponse = await fetch('/api/portfolio/save', {
+      const saveResponse = await fetch(`${API_BASE_URL}/api/portfolio/save`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -258,7 +259,7 @@ function Builder() {
       console.log('✅ Current data saved successfully. Now publishing...');
       
       // Then publish the freshly saved data
-      const response = await fetch('/api/portfolio/publish', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/publish`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -2,12 +2,12 @@ import React from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Navbar, Nav, Button, Card } from "react-bootstrap";
 import { images } from "../components/images";
-import Template1 from "../templates/Template1";
-import Template2 from "../templates/Template2";
-import Template3 from "../templates/Template3";
-import Template4 from "../templates/Template4";
-import Template5 from "../templates/Template5";
-import Template6 from "../templates/Template6";
+import Template1 from "../templates/Template1SuperEnhanced";
+import Template2 from "../templates/Template2SuperEnhanced";
+import Template3 from "../templates/Template3SuperEnhanced";
+import Template4 from "../templates/Template4SuperEnhanced";
+import Template5 from "../templates/Template5SuperEnhanced";
+import Template6 from "../templates/Template6SuperEnhanced";
 
 function Preview() {
   const history = useHistory();
@@ -15,39 +15,39 @@ function Preview() {
 
   const templateData = {
     template1: {
-      name: "Modern Developer",
+      name: "Modern Gradient",
       image: images.portfolio1,
-      description: "Sleek, modern design perfect for full-stack developers",
-      features: ["Gradient Design", "Smooth Animations", "Skills Showcase", "Project Portfolio"]
+      description: "Stunning gradient design with glassmorphism effects and 3D animations",
+      features: ["3D Animations", "Glassmorphism", "Gradient Backgrounds", "Interactive Elements"]
     },
     template2: {
-      name: "Creative Designer",
+      name: "Dark Terminal",
       image: images.portfolio2,
-      description: "Vibrant, artistic layout ideal for creative professionals",
-      features: ["Colorful Gradients", "Floating Elements", "Creative Animations", "Portfolio Gallery"]
+      description: "Developer-focused terminal theme with code syntax highlighting",
+      features: ["Terminal Interface", "Code Blocks", "Neon Effects", "Monospace Typography"]
     },
     template3: {
-      name: "Business Professional",
+      name: "Creative Magazine",
       image: images.portfolio3,
-      description: "Clean, corporate design for business consultants",
-      features: ["Professional Layout", "Progress Bars", "Case Studies", "Statistics Display"]
+      description: "Bold, colorful magazine-style layout with asymmetric design",
+      features: ["Magazine Layout", "Bold Colors", "Rotated Elements", "Creative Typography"]
     },
     template4: {
-      name: "Minimalist Clean",
+      name: "Card Masonry",
       image: images.portfolio4,
-      description: "Ultra-clean, minimal design focusing on typography",
-      features: ["Minimal Design", "Clean Typography", "Geometric Elements", "Elegant Layout"]
+      description: "Pinterest-style card layout with masonry grid system",
+      features: ["Masonry Grid", "Card Design", "Hover Effects", "Clean Layout"]
     },
     template5: {
-      name: "Developer Terminal",
+      name: "Glassmorphism",
       image: images.portfolio2,
-      description: "Dark theme terminal-style design for software engineers",
-      features: ["Dark Theme", "Code Syntax", "Terminal Style", "GitHub Integration"]
+      description: "Modern frosted glass effects with backdrop blur and floating elements",
+      features: ["Glass Effects", "Backdrop Blur", "Floating Cards", "Modern Design"]
     },
     template6: {
-      name: "Marketing Pro",
+      name: "Corporate Pro",
       image: images.portfolio1,
-      description: "Dynamic, results-focused design for marketing professionals",
+      description: "Professional corporate design with elegant typography and business focus",
       features: ["Gradient Animations", "Stats Display", "Campaign Showcase", "ROI Focus"]
     }
   };

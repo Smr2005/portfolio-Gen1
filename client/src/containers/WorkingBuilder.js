@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { Container, Row, Col, Card, Form, Button, Navbar, Nav, Alert, Tab, Tabs } from "react-bootstrap";
-import Template1 from "../templates/Template1";
-import Template2 from "../templates/Template2";
-import Template3 from "../templates/Template3Simple";
-import Template4 from "../templates/Template4";
-import Template5 from "../templates/Template5";
-import Template6 from "../templates/Template6";
+import Template1 from "../templates/Template1SuperEnhanced";
+import Template2 from "../templates/Template2SuperEnhanced";
+import Template3 from "../templates/Template3SuperEnhanced";
+import Template4 from "../templates/Template4SuperEnhanced";
+import Template5 from "../templates/Template5SuperEnhanced";
+import Template6 from "../templates/Template6SuperEnhanced";
 import { authenticatedFetch, isAuthenticated as checkAuth } from "../utils/auth";
 
+import { API_BASE_URL } from '../utils/api';
 function WorkingBuilder() {
   const history = useHistory();
   const location = useLocation();
@@ -81,9 +82,13 @@ function WorkingBuilder() {
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Template renderer function
-  const renderTemplate = (userData, isPreview = false) => {
-    const templateProps = { userData, isPreview };
+  // Template renderer function with editing support
+  const renderTemplate = (userData, isPreview = false, onDataChange = null) => {
+    const templateProps = { 
+      userData, 
+      isPreview, 
+      onDataChange: onDataChange || handleDataChange 
+    };
     
     switch(templateId) {
       case 'template1':
@@ -101,6 +106,12 @@ function WorkingBuilder() {
       default:
         return <Template1 {...templateProps} />;
     }
+  };
+
+  // Handle data changes from template editing
+  const handleDataChange = (newData) => {
+    setUserData(newData);
+    setSaved(false); // Mark as unsaved when data changes
   };
 
   useEffect(() => {
@@ -132,7 +143,7 @@ function WorkingBuilder() {
       const token = localStorage.getItem('token') || localStorage.getItem('jwt');
       if (!token) return;
 
-      const response = await fetch('/api/portfolio/my-portfolio', {
+      const response = await fetch(`${API_BASE_URL}/api/portfolio/my-portfolio`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1446,7 +1457,7 @@ function WorkingBuilder() {
               </Card.Header>
               <Card.Body style={{ maxHeight: '80vh', overflow: 'auto', position: 'relative', zIndex: 1 }}>
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                  {renderTemplate(userData, true)}
+                  {renderTemplate(userData, true, handleDataChange)}
                 </div>
               </Card.Body>
             </Card>

@@ -312,23 +312,23 @@ function generatePortfolioHTML(portfolio) {
         data = ensureDataUrls(data);
     }
     
-    // Generate HTML based on template ID - Updated for SuperEnhanced templates
+    // Generate HTML based on template ID
     switch(templateId) {
         case 'template1':
-            return generateTemplate1SuperEnhancedHTML(data, meta);
+            return generateTemplate1HTML(data, meta);
         case 'template2':
-            return generateTemplate2SuperEnhancedHTML(data, meta);
+            return generateTemplate2HTML(data, meta);
         case 'template3':
-            console.log('Generating Template3SuperEnhanced with data:', { name: data.name, templateId });
-            return generateTemplate3SuperEnhancedHTML(data, meta);
+            console.log('Generating Template3 with data:', { name: data.name, templateId });
+            return generateTemplate3HTML(data, meta);
         case 'template4':
-            return generateTemplate4SuperEnhancedHTML(data, meta);
+            return generateTemplate4HTML(data, meta);
         case 'template5':
-            return generateTemplate5SuperEnhancedHTML(data, meta);
+            return generateTemplate5HTML(data, meta);
         case 'template6':
-            return generateTemplate6SuperEnhancedHTML(data, meta);
+            return generateTemplate6HTML(data, meta);
         default:
-            return generateTemplate1SuperEnhancedHTML(data, meta);
+            return generateTemplate1HTML(data, meta);
     }
 }
 
@@ -5115,46 +5115,4 @@ function generateTemplate6HTML(data, meta) {
             margin: 2rem 0;
         }
         
-        .social-link {
-            color: rgba(255,255,255,0.8);
-            font-size: 2rem;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.2);
-            padding: 15px;
-            border-radius: 50%;
-            backdrop-filter: blur(10px);
-            text-decoration: none;
-        }
-        
-        .social-link:hover {
-            color: white;
-            transform: scale(1.1);
-            background: rgba(255,255,255,0.3);
-            text-decoration: none;
-        }
-        
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .hero-title { font-size: 2.5rem; }
-            .hero-subtitle { font-size: 1.2rem; }
-            .section-title { font-size: 2rem; }
-            .hero-section { padding: 60px 0; }
-            .section { padding: 60px 0; }
-        }
-    </style>
-</head>
-<body>
-    <h1>Portfolio Generator Backend</h1>
-    <p>Backend server is running. Please access the frontend at the configured URL.</p>
-</body>
-</html>
-    `;
-}
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📱 Frontend URL: ${getFrontendUrl()}`);
-    console.log(`🔗 Backend URL: ${getBaseUrl()}`);
-    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+        .

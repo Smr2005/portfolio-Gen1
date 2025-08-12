@@ -138,6 +138,12 @@ app.get("/admin-test", (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-test.html'));
 });
 
+// Root route - redirect to frontend
+app.get("/", (req, res) => {
+    const frontendUrl = getFrontendUrl();
+    res.redirect(frontendUrl);
+});
+
 // API health check route (moved after API routes)
 app.get("/api/health", async (req, res, next) => {
     res.json({ 
@@ -145,7 +151,8 @@ app.get("/api/health", async (req, res, next) => {
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
         port: process.env.PORT || 5000,
-        cors_origin: req.headers.origin
+        cors_origin: req.headers.origin,
+        frontend_url: getFrontendUrl()
     });
 });
 
@@ -305,23 +312,23 @@ function generatePortfolioHTML(portfolio) {
         data = ensureDataUrls(data);
     }
     
-    // Generate HTML based on template ID
+    // Generate HTML based on template ID - Updated for SuperEnhanced templates
     switch(templateId) {
         case 'template1':
-            return generateTemplate1HTML(data, meta);
+            return generateTemplate1SuperEnhancedHTML(data, meta);
         case 'template2':
-            return generateTemplate2HTML(data, meta);
+            return generateTemplate2SuperEnhancedHTML(data, meta);
         case 'template3':
-            console.log('Generating Template3 with data:', { name: data.name, templateId });
-            return generateTemplate3HTML(data, meta);
+            console.log('Generating Template3SuperEnhanced with data:', { name: data.name, templateId });
+            return generateTemplate3SuperEnhancedHTML(data, meta);
         case 'template4':
-            return generateTemplate4HTML(data, meta);
+            return generateTemplate4SuperEnhancedHTML(data, meta);
         case 'template5':
-            return generateTemplate5HTML(data, meta);
+            return generateTemplate5SuperEnhancedHTML(data, meta);
         case 'template6':
-            return generateTemplate6HTML(data, meta);
+            return generateTemplate6SuperEnhancedHTML(data, meta);
         default:
-            return generateTemplate1HTML(data, meta);
+            return generateTemplate1SuperEnhancedHTML(data, meta);
     }
 }
 
@@ -5117,27 +5124,135 @@ function generateTemplate6HTML(data, meta) {
             border-radius: 50%;
             backdrop-filter: blur(10px);
             text-decoration: none;
-              }
+        }
         
         .social-link:hover {
             color: white;
             transform: scale(1.1);
+            background: rgba(255,255,255,0.3);
             text-decoration: none;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.2rem; }
+            .section-title { font-size: 2rem; }
+            .hero-section { padding: 60px 0; }
+            .section { padding: 60px 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Contact Section -->
-    <section id="contact" class="gradient-bg text-center" style="padding: 60px 0; color: white;">
+    <!-- Hero Section -->
+    <section class="hero-section">
         <div class="container">
-            <h3 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">Ready to Drive Results Together?</h3>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9;">Let's discuss how I can help grow your business.</p>
-            ${data.email ? `<a href="mailto:${data.email}" class="btn btn-light btn-lg" style="font-size: 1.1rem; padding: 15px 40px;">
-                <i class="fas fa-envelope me-2"></i>Start the Conversation
-            </a>` : ''}
-            <div style="margin-top: 3rem;">
-                <p style="opacity: 0.8; margin: 0;">&copy; ${new Date().getFullYear()} ${data.name} - Marketing Portfolio</p>
-                <small style="opacity: 0.6;">Powered by <a href="${getFrontendUrl()}" target="_blank" style="color: rgba(255,255,255,0.8);">Portfolio Generator</a></small>
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        <h1 class="hero-title">${data.name || 'Your Name'}</h1>
+                        <p class="hero-subtitle">${data.title || 'Your Professional Title'}</p>
+                        <p class="hero-description">${data.about || 'Your professional description goes here...'}</p>
+                        <div class="hero-buttons">
+                            <a href="#projects" class="btn-marketing primary">View My Work</a>
+                            <a href="#contact" class="btn-marketing secondary">Get In Touch</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="hero-image">
+                        ${data.profileImage ? `<img src="${data.profileImage}" alt="Profile" class="profile-img">` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <p class="section-text">${data.about || 'Tell your story here...'}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    ${data.skills && data.skills.length > 0 ? `
+    <section class="section" id="skills">
+        <div class="container">
+            <h2 class="section-title">Skills</h2>
+            <div class="row">
+                ${data.skills.map(skill => `
+                    <div class="col-md-6 mb-3">
+                        <div class="skill-item">
+                            <div class="skill-header">
+                                <span class="skill-name">${skill.name}</span>
+                                <span class="skill-percentage">${skill.level}%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: ${skill.level}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Projects Section -->
+    ${data.projects && data.projects.length > 0 ? `
+    <section class="section" id="projects">
+        <div class="container">
+            <h2 class="section-title">Projects</h2>
+            <div class="row">
+                ${data.projects.map(project => `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="project-card">
+                            ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-image">` : ''}
+                            <div class="project-content">
+                                <h3 class="project-title">${project.title}</h3>
+                                <p class="project-description">${project.description}</p>
+                                ${project.technologies ? `
+                                    <div class="project-tech">
+                                        ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                                <div class="project-links">
+                                    ${project.liveUrl ? `<a href="${project.liveUrl}" class="btn-marketing primary" target="_blank">Live Demo</a>` : ''}
+                                    ${project.githubUrl ? `<a href="${project.githubUrl}" class="btn-marketing outline" target="_blank">View Code</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <p class="section-text">Ready to work together? Let's create something amazing!</p>
+                    <div class="contact-info">
+                        ${data.email ? `<p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>` : ''}
+                        ${data.phone ? `<p><strong>Phone:</strong> <a href="tel:${data.phone}">${data.phone}</a></p>` : ''}
+                        ${data.location ? `<p><strong>Location:</strong> ${data.location}</p>` : ''}
+                    </div>
+                    <div class="social-links">
+                        ${data.linkedin ? `<a href="${data.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin-in"></i></a>` : ''}
+                        ${data.github ? `<a href="${data.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                        ${data.website ? `<a href="${data.website}" class="social-link" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -5148,10 +5263,986 @@ function generateTemplate6HTML(data, meta) {
     `;
 }
 
-// Start the server
+// NEW SUPERENHANCED HTML GENERATION FUNCTIONS
+
+function generateTemplate1SuperEnhancedHTML(data, meta) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${meta?.title || data.name + ' - Modern Portfolio'}</title>
+    <meta name="description" content="${meta?.description || 'Modern Portfolio of ' + data.name}">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-attachment: fixed;
+            color: #1a202c;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Modern Gradient Animations */
+        @keyframes float3d {
+            0%, 100% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
+            25% { transform: translateY(-10px) rotateX(5deg) rotateY(5deg); }
+            50% { transform: translateY(-20px) rotateX(0deg) rotateY(10deg); }
+            75% { transform: translateY(-10px) rotateX(-5deg) rotateY(5deg); }
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            animation: float3d 8s ease-in-out infinite;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .hero-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 35px 70px rgba(0,0,0,0.3);
+        }
+        
+        .hero-name {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+        
+        .hero-title {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 4px solid rgba(255,255,255,0.3);
+            transition: all 0.4s ease;
+        }
+        
+        .profile-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        /* Section Styles */
+        .section {
+            padding: 100px 0;
+            position: relative;
+        }
+        
+        .glass-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 2rem 0;
+            color: white;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        /* Skills */
+        .skill-item {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .skill-name {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skill-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.8), rgba(255,255,255,0.6));
+            border-radius: 4px;
+            transition: width 2s ease-in-out;
+        }
+        
+        /* Projects */
+        .project-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .project-content {
+            padding: 2rem;
+            color: white;
+        }
+        
+        .project-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .tech-tag {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            display: inline-block;
+        }
+        
+        /* Buttons */
+        .glass-button {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        
+        .glass-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Contact */
+        .contact-item {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        .contact-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-name { font-size: 2.5rem; }
+            .section-title { font-size: 2rem; }
+            .profile-image { width: 150px; height: 150px; }
+            .hero-card, .glass-section { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <div class="hero-content">
+                        <div class="hero-card">
+                            <h1 class="hero-name">${data.name || 'Your Name'}</h1>
+                            <p class="hero-title">${data.title || 'Your Professional Title'}</p>
+                            <p class="mb-4">${data.about || 'Your professional description goes here...'}</p>
+                            <div>
+                                <a href="#projects" class="glass-button">View My Work</a>
+                                <a href="#contact" class="glass-button">Get In Touch</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="text-center">
+                        ${data.profileImage ? `<img src="${data.profileImage}" alt="Profile" class="profile-image">` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="glass-section">
+                <h2 class="section-title">About Me</h2>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <p style="font-size: 1.1rem; line-height: 1.8;">${data.about || 'Tell your story here...'}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    ${data.skills && data.skills.length > 0 ? `
+    <section class="section" id="skills">
+        <div class="container">
+            <div class="glass-section">
+                <h2 class="section-title">Skills</h2>
+                <div class="row">
+                    ${data.skills.map(skill => `
+                        <div class="col-md-6 mb-3">
+                            <div class="skill-item">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="skill-name">${skill.name}</span>
+                                    <span style="font-weight: 600;">${skill.level}%</span>
+                                </div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: ${skill.level}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Projects Section -->
+    ${data.projects && data.projects.length > 0 ? `
+    <section class="section" id="projects">
+        <div class="container">
+            <div class="glass-section">
+                <h2 class="section-title">Projects</h2>
+                <div class="row">
+                    ${data.projects.map(project => `
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="project-card">
+                                ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-image">` : ''}
+                                <div class="project-content">
+                                    <h3 class="project-title">${project.title}</h3>
+                                    <p style="margin-bottom: 1rem;">${project.description}</p>
+                                    ${project.technologies ? `
+                                        <div class="mb-3">
+                                            ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                                        </div>
+                                    ` : ''}
+                                    <div>
+                                        ${project.liveUrl ? `<a href="${project.liveUrl}" class="glass-button" target="_blank">Live Demo</a>` : ''}
+                                        ${project.githubUrl ? `<a href="${project.githubUrl}" class="glass-button" target="_blank">View Code</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="container">
+            <div class="glass-section">
+                <h2 class="section-title">Get In Touch</h2>
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <p class="text-center mb-4" style="font-size: 1.1rem;">Ready to work together? Let's create something amazing!</p>
+                        <div class="row">
+                            ${data.email ? `
+                                <div class="col-md-4">
+                                    <div class="contact-item">
+                                        <div class="contact-icon">📧</div>
+                                        <h5>Email</h5>
+                                        <a href="mailto:${data.email}" style="color: white;">${data.email}</a>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${data.phone ? `
+                                <div class="col-md-4">
+                                    <div class="contact-item">
+                                        <div class="contact-icon">📱</div>
+                                        <h5>Phone</h5>
+                                        <a href="tel:${data.phone}" style="color: white;">${data.phone}</a>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            ${data.location ? `
+                                <div class="col-md-4">
+                                    <div class="contact-item">
+                                        <div class="contact-icon">📍</div>
+                                        <h5>Location</h5>
+                                        <span>${data.location}</span>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="social-links">
+                            ${data.linkedin ? `<a href="${data.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin-in"></i></a>` : ''}
+                            ${data.github ? `<a href="${data.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                            ${data.website ? `<a href="${data.website}" class="social-link" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+    `;
+}
+
+function generateTemplate2SuperEnhancedHTML(data, meta) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${meta?.title || data.name + ' - Terminal Portfolio'}</title>
+    <meta name="description" content="${meta?.description || 'Developer Portfolio of ' + data.name}">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff88;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Terminal Animations */
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88, 0 0 15px #00ff88; }
+            50% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88; }
+        }
+        
+        /* Terminal Window */
+        .terminal-window {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: 0 0 20px rgba(0,255,136,0.3);
+        }
+        
+        .terminal-header {
+            background: #333;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .terminal-button.close { background: #ff5f56; }
+        .terminal-button.minimize { background: #ffbd2e; }
+        .terminal-button.maximize { background: #27ca3f; }
+        
+        .terminal-title {
+            margin-left: 1rem;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        
+        .terminal-content {
+            padding: 2rem;
+            background: #0a0a0a;
+            min-height: 300px;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .prompt {
+            color: #00ff88;
+            font-weight: 600;
+        }
+        
+        .cursor {
+            animation: blink 1s infinite;
+        }
+        
+        .hero-name {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        .hero-title {
+            color: #888;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Terminal Buttons */
+        .terminal-btn {
+            background: transparent;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 0.8rem 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .terminal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,136,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .terminal-btn:hover::before {
+            left: 100%;
+        }
+        
+        .terminal-btn:hover {
+            background: rgba(0,255,136,0.1);
+            box-shadow: 0 0 20px rgba(0,255,136,0.5);
+            color: #00ff88;
+            text-decoration: none;
+        }
+        
+        /* Section Styles */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            color: #00ff88;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .section-title::before {
+            content: '> ';
+            color: #00ff88;
+        }
+        
+        /* Skills */
+        .skill-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-item:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0,255,136,0.3);
+        }
+        
+        .skill-name {
+            color: #00ff88;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skill-bar {
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            border-radius: 2px;
+            transition: width 2s ease-in-out;
+        }
+        
+        /* Projects */
+        .project-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        
+        .project-card:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0,255,136,0.3);
+            transform: translateY(-5px);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+        
+        .project-card:hover .project-image {
+            filter: grayscale(0%);
+        }
+        
+        .project-content {
+            padding: 2rem;
+        }
+        
+        .project-title {
+            color: #00ff88;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .project-description {
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .tech-tag {
+            background: transparent;
+            border: 1px solid #555;
+            color: #888;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 0.2rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .tech-tag:hover {
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+        
+        /* Contact */
+        .contact-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-item:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0,255,136,0.3);
+        }
+        
+        .contact-icon {
+            font-size: 2rem;
+            color: #00ff88;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-label {
+            color: #888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .contact-value {
+            color: #ccc;
+            font-weight: 600;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .social-link {
+            width: 50px;
+            height: 50px;
+            background: transparent;
+            border: 1px solid #333;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            border-color: #00ff88;
+            color: #00ff88;
+            box-shadow: 0 0 15px rgba(0,255,136,0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-name { font-size: 2rem; }
+            .section-title { font-size: 2rem; }
+            .terminal-content { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <div class="terminal-button close"></div>
+                                <div class="terminal-button minimize"></div>
+                                <div class="terminal-button maximize"></div>
+                            </div>
+                            <div class="terminal-title">portfolio.sh</div>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="mb-3">
+                                <span class="prompt">user@portfolio:~$</span> whoami
+                            </div>
+                            <h1 class="hero-name">${data.name || 'Your Name'}<span class="cursor">_</span></h1>
+                            <div class="mb-3">
+                                <span class="prompt">user@portfolio:~$</span> cat role.txt
+                            </div>
+                            <p class="hero-title">${data.title || 'Your Professional Title'}</p>
+                            <div class="mb-3">
+                                <span class="prompt">user@portfolio:~$</span> cat about.md
+                            </div>
+                            <p style="color: #ccc; margin-bottom: 2rem;">${data.about || 'Your professional description goes here...'}</p>
+                            <div class="mb-3">
+                                <span class="prompt">user@portfolio:~$</span> ls commands/
+                            </div>
+                            <div>
+                                <a href="#projects" class="terminal-btn">./view_projects.sh</a>
+                                <a href="#contact" class="terminal-btn">./contact.sh</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    ${data.skills && data.skills.length > 0 ? `
+    <section class="section" id="skills">
+        <div class="container">
+            <h2 class="section-title">Skills</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="row mt-4">
+                        ${data.skills.map(skill => `
+                            <div class="col-md-6 mb-3">
+                                <div class="skill-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="skill-name">${skill.name}</span>
+                                        <span style="color: #888;">${skill.level}%</span>
+                                    </div>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" style="width: ${skill.level}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Projects Section -->
+    ${data.projects && data.projects.length > 0 ? `
+    <section class="section" id="projects">
+        <div class="container">
+            <h2 class="section-title">Projects</h2>
+            <div class="row">
+                ${data.projects.map(project => `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="project-card">
+                            ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-image">` : ''}
+                            <div class="project-content">
+                                <h3 class="project-title">${project.title}</h3>
+                                <p class="project-description">${project.description}</p>
+                                ${project.technologies ? `
+                                    <div class="mb-3">
+                                        ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                                <div>
+                                    ${project.liveUrl ? `<a href="${project.liveUrl}" class="terminal-btn" target="_blank">Live Demo</a>` : ''}
+                                    ${project.githubUrl ? `<a href="${project.githubUrl}" class="terminal-btn" target="_blank">View Code</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Contact</h2>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="terminal-window">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <div class="terminal-button close"></div>
+                                <div class="terminal-button minimize"></div>
+                                <div class="terminal-button maximize"></div>
+                            </div>
+                            <div class="terminal-title">contact.sh</div>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="mb-3">
+                                <span class="prompt">user@portfolio:~$</span> ./contact.sh --info
+                            </div>
+                            <div class="row">
+                                ${data.email ? `
+                                    <div class="col-md-4">
+                                        <div class="contact-item">
+                                            <div class="contact-icon">📧</div>
+                                            <div class="contact-label">Email</div>
+                                            <div class="contact-value">
+                                                <a href="mailto:${data.email}" style="color: #00ff88; text-decoration: none;">${data.email}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${data.phone ? `
+                                    <div class="col-md-4">
+                                        <div class="contact-item">
+                                            <div class="contact-icon">📱</div>
+                                            <div class="contact-label">Phone</div>
+                                            <div class="contact-value">
+                                                <a href="tel:${data.phone}" style="color: #00ff88; text-decoration: none;">${data.phone}</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${data.location ? `
+                                    <div class="col-md-4">
+                                        <div class="contact-item">
+                                            <div class="contact-icon">📍</div>
+                                            <div class="contact-label">Location</div>
+                                            <div class="contact-value">${data.location}</div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="text-center mt-4">
+                                <div class="mb-3">
+                                    <span class="prompt">user@portfolio:~$</span> ls social/
+                                </div>
+                                <div class="social-links">
+                                    ${data.linkedin ? `<a href="${data.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin-in"></i></a>` : ''}
+                                    ${data.github ? `<a href="${data.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                                    ${data.website ? `<a href="${data.website}" class="social-link" target="_blank"><i class="fas fa-globe"></i></a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+    `;
+}
+
+// Add placeholder functions for the remaining templates
+function generateTemplate3SuperEnhancedHTML(data, meta) {
+    return generateTemplate1SuperEnhancedHTML(data, meta); // Temporary fallback
+}
+
+function generateTemplate4SuperEnhancedHTML(data, meta) {
+    return generateTemplate1SuperEnhancedHTML(data, meta); // Temporary fallback
+}
+
+function generateTemplate5SuperEnhancedHTML(data, meta) {
+    return generateTemplate1SuperEnhancedHTML(data, meta); // Temporary fallback
+}
+
+function generateTemplate6SuperEnhancedHTML(data, meta) {
+    return generateTemplate1SuperEnhancedHTML(data, meta); // Temporary fallback
+}
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log('ðŸš€ Server running on port ' + PORT);
-    console.log('ðŸ“Š Backend URL: http://localhost:' + PORT);
-    console.log('ðŸŒ Environment: ' + (process.env.NODE_ENV || 'development'));
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Frontend URL: ${getFrontendUrl()}`);
+    console.log(`🔗 Backend URL: ${getBaseUrl()}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
 });

@@ -138,12 +138,6 @@ app.get("/admin-test", (req, res) => {
     res.sendFile(path.join(__dirname, 'admin-test.html'));
 });
 
-// Root route - redirect to frontend
-app.get("/", (req, res) => {
-    const frontendUrl = getFrontendUrl();
-    res.redirect(frontendUrl);
-});
-
 // API health check route (moved after API routes)
 app.get("/api/health", async (req, res, next) => {
     res.json({ 
@@ -151,8 +145,7 @@ app.get("/api/health", async (req, res, next) => {
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
         port: process.env.PORT || 5000,
-        cors_origin: req.headers.origin,
-        frontend_url: getFrontendUrl()
+        cors_origin: req.headers.origin
     });
 });
 
@@ -312,7 +305,7 @@ function generatePortfolioHTML(portfolio) {
         data = ensureDataUrls(data);
     }
     
-    // Generate HTML based on template ID - Updated for SuperEnhanced templates
+    // Generate HTML based on template ID - Using SuperEnhanced versions to match React templates
     switch(templateId) {
         case 'template1':
             return generateTemplate1SuperEnhancedHTML(data, meta);
@@ -5144,11 +5137,1149 @@ function generateTemplate6HTML(data, meta) {
     </style>
 </head>
 <body>
-    <h1>Portfolio Generator Backend</h1>
-    <p>Backend server is running. Please access the frontend at the configured URL.</p>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        ${data.profileImage ? `<img src="${data.profileImage}" alt="${data.name}" class="profile-image">` : ''}
+                        <h1 class="hero-title">${data.name || 'Your Name'}</h1>
+                        <p class="hero-subtitle">${data.title || 'Your Professional Title'}</p>
+                        <div class="social-links">
+                            ${data.socialLinks?.github ? `<a href="${data.socialLinks.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                            ${data.socialLinks?.linkedin ? `<a href="${data.socialLinks.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>` : ''}
+                            ${data.socialLinks?.twitter ? `<a href="${data.socialLinks.twitter}" class="social-link" target="_blank"><i class="fab fa-twitter"></i></a>` : ''}
+                            ${data.socialLinks?.email ? `<a href="mailto:${data.socialLinks.email}" class="social-link"><i class="fas fa-envelope"></i></a>` : ''}
+                        </div>
+                        <a href="#about" class="btn-primary-custom">Learn More About Me</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">About Me</h2>
+                </div>
+                <div class="col-lg-8 mx-auto">
+                    <div class="about-content">
+                        <p class="about-text">${data.about || 'Tell us about yourself, your background, and what drives your passion for your field.'}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    ${data.skills && data.skills.length > 0 ? `
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Skills & Expertise</h2>
+                </div>
+                ${data.skills.map(skill => `
+                <div class="col-lg-4 col-md-6">
+                    <div class="skill-item">
+                        <div class="skill-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4 class="skill-name">${skill.name || skill}</h4>
+                        <p class="skill-description">${skill.description || 'Proficient in this technology'}</p>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Projects Section -->
+    ${data.projects && data.projects.length > 0 ? `
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Featured Projects</h2>
+                </div>
+                ${data.projects.map(project => `
+                <div class="col-lg-6">
+                    <div class="project-card">
+                        ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-image">` : ''}
+                        <div class="project-content">
+                            <h4 class="project-title">${project.title || 'Project Title'}</h4>
+                            <p class="project-description">${project.description || 'Project description goes here.'}</p>
+                            ${project.technologies && project.technologies.length > 0 ? `
+                            <div class="project-tech">
+                                ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            </div>
+                            ` : ''}
+                            <div class="project-links">
+                                ${project.liveUrl ? `<a href="${project.liveUrl}" class="project-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Live Demo</a>` : ''}
+                                ${project.githubUrl ? `<a href="${project.githubUrl}" class="project-link secondary" target="_blank"><i class="fab fa-github"></i> Code</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Experience Section -->
+    ${data.experience && data.experience.length > 0 ? `
+    <section id="experience" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Professional Experience</h2>
+                </div>
+                <div class="col-lg-8 mx-auto">
+                    ${data.experience.map(exp => `
+                    <div class="experience-item">
+                        <h4 class="experience-title">${exp.position || 'Position Title'}</h4>
+                        <p class="experience-company">${exp.company || 'Company Name'}</p>
+                        <p class="experience-duration">${exp.duration || 'Duration'}</p>
+                        <p class="experience-description">${exp.description || 'Job description and achievements.'}</p>
+                    </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Contact Section -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Get In Touch</h2>
+                </div>
+                <div class="col-lg-6">
+                    <div class="contact-info">
+                        ${data.contact?.email ? `
+                        <div class="contact-item">
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <span>${data.contact.email}</span>
+                        </div>
+                        ` : ''}
+                        ${data.contact?.phone ? `
+                        <div class="contact-item">
+                            <i class="fas fa-phone contact-icon"></i>
+                            <span>${data.contact.phone}</span>
+                        </div>
+                        ` : ''}
+                        ${data.contact?.location ? `
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt contact-icon"></i>
+                            <span>${data.contact.location}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; ${new Date().getFullYear()} ${data.name || 'Your Name'}. All rights reserved.</p>
+                <p>Built with Portfolio Generator</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
     `;
+}
+
+// SuperEnhanced Template Functions that match React templates
+
+function generateTemplate1SuperEnhancedHTML(data, meta) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${meta?.title || data.name + ' - Portfolio'}</title>
+    <meta name="description" content="${meta?.description || 'Portfolio of ' + data.name}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* ENHANCED ANIMATIONS */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        /* HERO SECTION */
+        .hero-section {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            color: white;
+            text-align: center;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid rgba(255,255,255,0.3);
+            margin-bottom: 2rem;
+            animation: float 6s ease-in-out infinite;
+            object-fit: cover;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        /* SECTIONS */
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #2d3748;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        /* SKILLS */
+        .skill-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .skill-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        /* PROJECTS */
+        .project-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+        
+        .project-card:hover .project-image {
+            transform: scale(1.1);
+        }
+        
+        .project-content {
+            padding: 2rem;
+        }
+        
+        .tech-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        /* BUTTONS */
+        .btn-primary-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary-custom {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* SOCIAL LINKS */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .social-link {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.5rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .social-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+            text-decoration: none;
+        }
+        
+        /* CONTACT SECTION */
+        .contact-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .contact-section .section-title {
+            color: white;
+        }
+        
+        .contact-form {
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-control {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        
+        .form-control:focus {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            color: white;
+            box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(240, 147, 251, 0.3);
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .section-title { font-size: 2rem; }
+            .section { padding: 60px 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        ${data.profileImage ? `<img src="${data.profileImage}" alt="${data.name}" class="profile-image">` : ''}
+                        <h1 class="hero-title">${data.name || 'Your Name'}</h1>
+                        <p class="hero-subtitle">${data.title || 'Your Professional Title'}</p>
+                        <div class="social-links">
+                            ${data.socialLinks?.github ? `<a href="${data.socialLinks.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                            ${data.socialLinks?.linkedin ? `<a href="${data.socialLinks.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>` : ''}
+                            ${data.socialLinks?.twitter ? `<a href="${data.socialLinks.twitter}" class="social-link" target="_blank"><i class="fab fa-twitter"></i></a>` : ''}
+                            ${data.socialLinks?.email ? `<a href="mailto:${data.socialLinks.email}" class="social-link"><i class="fas fa-envelope"></i></a>` : ''}
+                        </div>
+                        <a href="#about" class="btn-primary-custom">Learn More About Me</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">About Me</h2>
+                </div>
+                <div class="col-lg-8 mx-auto">
+                    <p class="lead text-center">${data.about || 'Tell us about yourself, your background, and what drives your passion for your field.'}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    ${data.skills && data.skills.length > 0 ? `
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Skills & Expertise</h2>
+                </div>
+                ${data.skills.map(skill => `
+                <div class="col-lg-4 col-md-6">
+                    <div class="skill-card text-center">
+                        <div class="skill-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4>${skill.name || skill}</h4>
+                        <p class="text-muted">${skill.description || 'Proficient in this technology'}</p>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Projects Section -->
+    ${data.projects && data.projects.length > 0 ? `
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Featured Projects</h2>
+                </div>
+                ${data.projects.map(project => `
+                <div class="col-lg-6">
+                    <div class="project-card">
+                        ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-image">` : ''}
+                        <div class="project-content">
+                            <h4>${project.title || 'Project Title'}</h4>
+                            <p class="text-muted">${project.description || 'Project description goes here.'}</p>
+                            ${project.technologies && project.technologies.length > 0 ? `
+                            <div class="mb-3">
+                                ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            </div>
+                            ` : ''}
+                            <div>
+                                ${project.liveUrl ? `<a href="${project.liveUrl}" class="btn-primary-custom" target="_blank"><i class="fas fa-external-link-alt"></i> Live Demo</a>` : ''}
+                                ${project.githubUrl ? `<a href="${project.githubUrl}" class="btn-secondary-custom" target="_blank"><i class="fab fa-github"></i> Code</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Experience Section -->
+    ${data.experience && data.experience.length > 0 ? `
+    <section id="experience" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Professional Experience</h2>
+                </div>
+                <div class="col-lg-8 mx-auto">
+                    ${data.experience.map(exp => `
+                    <div class="skill-card mb-4">
+                        <h4>${exp.position || 'Position Title'}</h4>
+                        <h5 class="text-primary">${exp.company || 'Company Name'}</h5>
+                        <p class="text-muted">${exp.duration || 'Duration'}</p>
+                        <p>${exp.description || 'Job description and achievements.'}</p>
+                    </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Contact Section -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Get In Touch</h2>
+                </div>
+                <div class="col-lg-6">
+                    <div class="mb-4">
+                        ${data.contact?.email ? `<p><i class="fas fa-envelope me-2"></i> ${data.contact.email}</p>` : ''}
+                        ${data.contact?.phone ? `<p><i class="fas fa-phone me-2"></i> ${data.contact.phone}</p>` : ''}
+                        ${data.contact?.location ? `<p><i class="fas fa-map-marker-alt me-2"></i> ${data.contact.location}</p>` : ''}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <form class="contact-form">
+                        <input type="text" class="form-control" placeholder="Your Name" required>
+                        <input type="email" class="form-control" placeholder="Your Email" required>
+                        <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                        <button type="submit" class="btn-submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; ${new Date().getFullYear()} ${data.name || 'Your Name'}. All rights reserved.</p>
+            <p>Built with Portfolio Generator</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+    `;
+}
+
+// Template 2 SuperEnhanced - Creative Dark Theme
+function generateTemplate2SuperEnhancedHTML(data, meta) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${meta?.title || data.name + ' - Creative Portfolio'}</title>
+    <meta name="description" content="${meta?.description || 'Creative Portfolio of ' + data.name}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        /* CREATIVE ANIMATIONS */
+        @keyframes neonGlow {
+            0%, 100% {
+                text-shadow: 0 0 5px #ff6b6b, 0 0 10px #ff6b6b, 0 0 15px #ff6b6b;
+            }
+            50% {
+                text-shadow: 0 0 10px #4ecdc4, 0 0 20px #4ecdc4, 0 0 30px #4ecdc4;
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(2deg); }
+            66% { transform: translateY(5px) rotate(-1deg); }
+        }
+        
+        @keyframes colorShift {
+            0% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(180deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        /* HERO SECTION */
+        .hero-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(78, 205, 196, 0.1) 0%, transparent 50%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 3px solid #ff6b6b;
+            margin-bottom: 2rem;
+            animation: float 6s ease-in-out infinite;
+            object-fit: cover;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: neonGlow 3s ease-in-out infinite alternate;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #4ecdc4;
+            opacity: 0.9;
+        }
+        
+        /* SECTIONS */
+        .section {
+            padding: 80px 0;
+            position: relative;
+        }
+        
+        .section:nth-child(even) {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #4ecdc4;
+            text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+        
+        /* CARDS */
+        .creative-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .creative-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .creative-card:hover::before {
+            left: 100%;
+        }
+        
+        .creative-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #ff6b6b;
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.2);
+        }
+        
+        .skill-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            animation: colorShift 4s ease-in-out infinite;
+        }
+        
+        /* PROJECTS */
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-15px);
+            border-color: #4ecdc4;
+            box-shadow: 0 25px 50px rgba(78, 205, 196, 0.2);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: all 0.4s ease;
+        }
+        
+        .project-card:hover .project-image {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        
+        .project-content {
+            padding: 2rem;
+        }
+        
+        .tech-tag {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+        }
+        
+        /* BUTTONS */
+        .btn-creative {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-creative::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-creative:hover::before {
+            left: 100%;
+        }
+        
+        .btn-creative:hover {
+            transform: scale(1.05);
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* SOCIAL LINKS */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .social-link {
+            color: #4ecdc4;
+            font-size: 1.5rem;
+            padding: 1rem;
+            background: rgba(78, 205, 196, 0.1);
+            border: 2px solid #4ecdc4;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            color: white;
+            background: #4ecdc4;
+            transform: scale(1.1) rotate(360deg);
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+        }
+        
+        /* FOOTER */
+        .footer {
+            background: #0a0a0a;
+            color: #4ecdc4;
+            text-align: center;
+            padding: 3rem 0;
+            border-top: 1px solid rgba(78, 205, 196, 0.2);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .section-title { font-size: 2rem; }
+            .section { padding: 60px 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        ${data.profileImage ? `<img src="${data.profileImage}" alt="${data.name}" class="profile-image">` : ''}
+                        <h1 class="hero-title">${data.name || 'Your Name'}</h1>
+                        <p class="hero-subtitle">${data.title || 'Creative Professional'}</p>
+                        <div class="social-links">
+                            ${data.socialLinks?.github ? `<a href="${data.socialLinks.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                            ${data.socialLinks?.linkedin ? `<a href="${data.socialLinks.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>` : ''}
+                            ${data.socialLinks?.twitter ? `<a href="${data.socialLinks.twitter}" class="social-link" target="_blank"><i class="fab fa-twitter"></i></a>` : ''}
+                            ${data.socialLinks?.email ? `<a href="mailto:${data.socialLinks.email}" class="social-link"><i class="fas fa-envelope"></i></a>` : ''}
+                        </div>
+                        <a href="#projects" class="btn-creative">View My Work</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">About Me</h2>
+                </div>
+                <div class="col-lg-8 mx-auto">
+                    <div class="creative-card text-center">
+                        <p class="lead">${data.about || 'Creative professional with a passion for innovative design and development.'}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    ${data.skills && data.skills.length > 0 ? `
+    <section id="skills" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Skills & Expertise</h2>
+                </div>
+                ${data.skills.map(skill => `
+                <div class="col-lg-4 col-md-6">
+                    <div class="creative-card text-center">
+                        <div class="skill-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4 class="text-white">${skill.name || skill}</h4>
+                        <p class="text-muted">${skill.description || 'Proficient in this technology'}</p>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Projects Section -->
+    ${data.projects && data.projects.length > 0 ? `
+    <section id="projects" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Featured Projects</h2>
+                </div>
+                ${data.projects.map(project => `
+                <div class="col-lg-6">
+                    <div class="project-card">
+                        ${project.image ? `<img src="${project.image}" alt="${project.title}" class="project-image">` : ''}
+                        <div class="project-content">
+                            <h4 class="text-white">${project.title || 'Project Title'}</h4>
+                            <p class="text-muted">${project.description || 'Project description goes here.'}</p>
+                            ${project.technologies && project.technologies.length > 0 ? `
+                            <div class="mb-3">
+                                ${project.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                            </div>
+                            ` : ''}
+                            <div>
+                                ${project.liveUrl ? `<a href="${project.liveUrl}" class="btn-creative" target="_blank"><i class="fas fa-external-link-alt"></i> Live Demo</a>` : ''}
+                                ${project.githubUrl ? `<a href="${project.githubUrl}" class="btn-creative" target="_blank"><i class="fab fa-github"></i> Code</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>
+    ` : ''}
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="section-title">Get In Touch</h2>
+                </div>
+                <div class="col-lg-6 mx-auto">
+                    <div class="creative-card text-center">
+                        ${data.contact?.email ? `<p><i class="fas fa-envelope me-2 text-primary"></i> ${data.contact.email}</p>` : ''}
+                        ${data.contact?.phone ? `<p><i class="fas fa-phone me-2 text-primary"></i> ${data.contact.phone}</p>` : ''}
+                        ${data.contact?.location ? `<p><i class="fas fa-map-marker-alt me-2 text-primary"></i> ${data.contact.location}</p>` : ''}
+                        <div class="social-links">
+                            ${data.socialLinks?.github ? `<a href="${data.socialLinks.github}" class="social-link" target="_blank"><i class="fab fa-github"></i></a>` : ''}
+                            ${data.socialLinks?.linkedin ? `<a href="${data.socialLinks.linkedin}" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; ${new Date().getFullYear()} ${data.name || 'Your Name'}. All rights reserved.</p>
+            <p>Built with Portfolio Generator</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+    `;
+}
+
+// Template 3-6 SuperEnhanced (using Template 1 and 2 as base for now)
+function generateTemplate3SuperEnhancedHTML(data, meta) {
+    return generateTemplate1SuperEnhancedHTML(data, meta);
+}
+
+function generateTemplate4SuperEnhancedHTML(data, meta) {
+    return generateTemplate1SuperEnhancedHTML(data, meta);
+}
+
+function generateTemplate5SuperEnhancedHTML(data, meta) {
+    return generateTemplate2SuperEnhancedHTML(data, meta);
+}
+
+function generateTemplate6SuperEnhancedHTML(data, meta) {
+    return generateTemplate2SuperEnhancedHTML(data, meta);
 }
 
 const PORT = process.env.PORT || 5000;
